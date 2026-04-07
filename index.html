@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>快捷启动器 beta 0.1</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0">
+<style>
+* {
+  margin:0; padding:0; box-sizing:border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded' !important;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  user-select: none;
+}
+
+:root {
+  --md3-primary: #6750A4;
+  --md3-on-primary: #fff;
+  --md3-surface: #FFFBFE;
+  --md3-surface-container: #F3EDF7;
+  --md3-on-surface: #1C1B1F;
+  --md3-outline: #79747E;
+  --radius-full: 999px;
+  --radius-lg: 32px;
+  --radius-md: 20px;
+  --anim-duration: 0.3s;
+  --font-scale: 1;
+  --font-title: clamp(18px, 5vw * var(--font-scale), 26px);
+  --font-text: clamp(14px, 3.5vw * var(--font-scale), 18px);
+  --font-label: clamp(12px, 3vw * var(--font-scale), 16px);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --md3-primary: #D0BCFF;
+    --md3-on-primary: #381E72;
+    --md3-surface: #1C1B1F;
+    --md3-surface-container: #2B2930;
+    --md3-on-surface: #E6E1E5;
+    --md3-outline: #938F99;
+  }
+}
+
+.no-anim * { transition: none !important; }
+.no-icon .app-icon, .no-icon .nav-icon { display: none !important; }
+
+html, body {
+  height: 100%;
+  background: var(--md3-surface-container);
+  color: var(--md3-on-surface);
+  font-family: system-ui, sans-serif;
+  overflow: hidden;
+}
+.wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.pages {
+  flex: 1;
+  position: relative;
+  padding-bottom: 90px;
+}
+.page {
+  position: absolute;
+  inset: 0;
+  padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 0;
+  transform: translateX(30px);
+  transition: opacity var(--anim-duration) cubic-bezier(0.2,0,0,1), transform var(--anim-duration) cubic-bezier(0.2,0,0,1);
+  pointer-events: none;
+}
+.page.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.card {
+  background: var(--md3-surface);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: var(--font-title);
+  margin-bottom: 12px;
+}
+input {
+  width: 100%;
+  height: 48px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--md3-outline);
+  background: transparent;
+  color: var(--md3-on-surface);
+  margin-bottom: 12px;
+  outline: none;
+  font-size: var(--font-text);
+}
+.btn {
+  width: 100%;
+  height: 44px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--md3-primary);
+  color: var(--md3-on-primary);
+  font-weight: 500;
+  margin-bottom: 8px;
+  font-size: var(--font-text);
+}
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--md3-outline);
+  color: var(--md3-on-surface);
+}
+
+.history {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.history-item {
+  padding: 10px;
+  background: var(--md3-surface-container);
+  border-radius: var(--radius-md);
+  font-size: var(--font-label);
+  cursor: pointer;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.app-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+.app-name {
+  font-size: var(--font-label);
+  text-align: center;
+}
+
+/* 底部导航圆角改成 54px */
+.nav {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  height: 70px;
+  background: var(--md3-surface);
+  display: flex;
+  align-items: center;
+  border-radius: 54px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-label);
+  color: var(--md3-outline);
+  cursor: pointer;
+}
+.nav-item.active {
+  color: var(--md3-primary);
+}
+
+.modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: grid; place-items: center;
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--anim-duration) ease;
+  z-index: 999;
+}
+.modal.show {
+  opacity: 1; visibility: visible;
+}
+.modal-box {
+  background: var(--md3-surface);
+  border-radius: var(--radius-lg);
+  width: 280px;
+  padding: 20px;
+  transform: scale(0.95);
+  transition: transform var(--anim-duration) ease;
+}
+.modal.show .modal-box {
+  transform: scale(1);
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+.modal-btn {
+  border: none;
+  background: transparent;
+  color: var(--md3-primary);
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: var(--font-label);
+  cursor: pointer;
+}
+.modal-btn.confirm {
+  background: var(--md3-primary);
+  color: var(--md3-on-primary);
+}
+
+.set-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  font-size: var(--font-text);
+}
+.switch {
+  width: 44px; height: 22px;
+  border-radius: 11px;
+  background: var(--md3-outline);
+  position: relative;
+  cursor: pointer;
+}
+.switch::after {
+  content: '';
+  position: absolute;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  top: 3px; left: 3px;
+  transition: transform var(--anim-duration) ease;
+}
+.switch.on { background: var(--md3-primary); }
+.switch.on::after { transform: translateX(22px); }
+
+.slider {
+  width: 100%;
+  margin-top: 8px;
+  accent-color: var(--md3-primary);
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<div class="pages">
+  <div class="page active" id="page-main">
+    <div class="card">
+      <div class="card-title">快捷启动</div>
+      <input id="input" placeholder="包名或网址">
+      <button class="btn" id="open">打开</button>
+      <div class="card-title">历史记录</div>
+      <div class="history" id="history"></div>
+      <button class="btn btn-outline" id="clear">清空历史</button>
+    </div>
+  </div>
+
+  <div class="page" id="page-apps">
+    <div class="card">
+      <div class="card-title">常用应用</div>
+      <div class="grid" id="app-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">常用网页</div>
+      <div class="grid" id="web-grid"></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-settings">
+    <div class="card">
+      <div class="card-title">动画设置</div>
+      <div class="set-item">
+        <div>启用动画</div>
+        <div class="switch" id="anim-toggle"></div>
+      </div>
+      <div style="margin-top:8px">
+        <div style="font-size:var(--font-label)">动画速度</div>
+        <input type="range" min="150" max="500" value="300" class="slider" id="anim-speed">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">显示设置</div>
+      <div class="set-item">
+        <div>显示图标</div>
+        <div class="switch" id="icon-toggle"></div>
+      </div>
+      <div style="margin-top:8px">
+        <div style="font-size:var(--font-label)">字体大小</div>
+        <input type="range" min="0.8" max="1.4" step="0.1" value="1" class="slider" id="font-size">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">关于</div>
+      <div class="set-item">
+        <div>版本: beta 0.1</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="nav">
+  <div class="nav-item active" data-page="page-main">
+    <span class="material-symbols-rounded nav-icon">rocket_launch</span>
+    <span>启动</span>
+  </div>
+  <div class="nav-item" data-page="page-apps">
+    <span class="material-symbols-rounded nav-icon">apps</span>
+    <span>应用</span>
+  </div>
+  <div class="nav-item" data-page="page-settings">
+    <span class="material-symbols-rounded nav-icon">settings</span>
+    <span>设置</span>
+  </div>
+</div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div style="font-size:var(--font-text);margin-bottom:8px">打开确认</div>
+    <div id="modal-text" style="font-size:var(--font-label)"></div>
+    <div class="modal-actions">
+      <button class="modal-btn" id="m-cancel">取消</button>
+      <button class="modal-btn confirm" id="m-ok">打开</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let cfg = JSON.parse(localStorage.getItem('cfg') || '{"anim":1,"speed":300,"icon":1,"font":1}')
+const root = document.documentElement
+const body = document.body
+
+function applyConfig() {
+  root.style.setProperty('--anim-duration', cfg.speed + 'ms')
+  root.style.setProperty('--font-scale', cfg.font)
+  body.classList.toggle('no-anim', !cfg.anim)
+  body.classList.toggle('no-icon', !cfg.icon)
+  
+  document.getElementById('anim-toggle').classList.toggle('on', cfg.anim)
+  document.getElementById('icon-toggle').classList.toggle('on', cfg.icon)
+  document.getElementById('anim-speed').value = cfg.speed
+  document.getElementById('font-size').value = cfg.font
+}
+applyConfig()
+
+const pages = document.querySelectorAll('.page')
+const navs = document.querySelectorAll('.nav-item')
+navs.forEach(item => {
+  item.addEventListener('click', () => {
+    const target = item.dataset.page
+    pages.forEach(p => p.classList.remove('active'))
+    navs.forEach(i => i.classList.remove('active'))
+    document.getElementById(target).classList.add('active')
+    item.classList.add('active')
+  })
+})
+
+let currentTarget = ''
+function openRouter(target) {
+  if(!target) return
+  target = target.trim()
+  
+  let hist = JSON.parse(localStorage.getItem('hist') || '[]')
+  if(!hist.includes(target)) {
+    hist.unshift(target)
+    hist = hist.slice(0, 15)
+    localStorage.setItem('hist', JSON.stringify(hist))
+    renderHist()
+  }
+
+  if(target.startsWith('http')) {
+    window.open(target, '_blank')
+  } else {
+    window.location.href = `intent://#Intent;package=${target};action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end`
+  }
+}
+
+const modal = document.getElementById('modal')
+const mText = document.getElementById('modal-text')
+const mCancel = document.getElementById('m-cancel')
+const mOk = document.getElementById('m-ok')
+
+function showConfirm(target) {
+  currentTarget = target
+  mText.textContent = `确定打开：\n${target}`
+  modal.classList.add('show')
+}
+function hideConfirm() {
+  modal.classList.remove('show')
+  currentTarget = ''
+}
+
+mCancel.addEventListener('click', hideConfirm)
+mOk.addEventListener('click', () => {
+  if(currentTarget) openRouter(currentTarget)
+  hideConfirm()
+})
+
+const apps = [
+  {n:"微信",p:"com.tencent.mm",icon:"chat",c:"#07C160"},
+  {n:"QQ",p:"com.tencent.mobileqq",icon:"forum",c:"#12B7F5"},
+  {n:"设置",p:"com.android.settings",icon:"settings",c:"#607D8B"},
+  {n:"浏览器",p:"com.android.browser",icon:"globe",c:"#1E88E5"},
+  {n:"我的世界",p:"com.mojang.minecraftpe",icon:"cube",c:"#795548"},
+  {n:"相机",p:"com.huawei.camera",icon:"camera",c:"#F57C00"}
+]
+const webs = [
+  {n:"Bing",u:"https://bing.com",icon:"search",c:"#007DB8"},
+  {n:"百度",u:"https://baidu.com",icon:"find_in_page",c:"#2932E3"},
+  {n:"B站",u:"https://bilibili.com",icon:"play_arrow",c:"#FB7299"},
+  {n:"抖音",u:"https://douyin.com",icon:"music_video",c:"#000"},
+  {n:"淘宝",u:"https://taobao.com",icon:"shopping_cart",c:"#FF4400"},
+  {n:"支付宝",u:"https://alipay.com",icon:"payment",c:"#1677FF"}
+]
+
+function makeGrid(el, arr, isWeb) {
+  const box = document.getElementById(el)
+  arr.forEach(item => {
+    const div = document.createElement('div')
+    div.className = 'app'
+    div.innerHTML = `
+      <div class="app-icon" style="background:${item.c}">
+        <span class="material-symbols-rounded">${item.icon}</span>
+      </div>
+      <div class="app-name">${item.n}</div>
+    `
+    div.addEventListener('click', () => {
+      showConfirm(isWeb ? item.u : item.p)
+    })
+    box.appendChild(div)
+  })
+}
+makeGrid('app-grid', apps)
+makeGrid('web-grid', webs, true)
+
+const input = document.getElementById('input')
+const openBtn = document.getElementById('open')
+const histEl = document.getElementById('history')
+const clearBtn = document.getElementById('clear')
+
+function renderHist() {
+  let hist = JSON.parse(localStorage.getItem('hist') || '[]')
+  if(!hist.length) {
+    histEl.innerHTML = '<div style="text-align:center;color:#888;font-size:var(--font-label)">暂无记录</div>'
+    return
+  }
+  histEl.innerHTML = ''
+  hist.forEach(item => {
+    const div = document.createElement('div')
+    div.className = 'history-item'
+    div.textContent = item
+    div.addEventListener('click', () => input.value = item)
+    histEl.appendChild(div)
+  })
+}
+clearBtn.addEventListener('click', () => {
+  localStorage.setItem('hist', '[]')
+  renderHist()
+})
+renderHist()
+
+openBtn.addEventListener('click', () => {
+  const val = input.value.trim()
+  if(val) showConfirm(val)
+})
+input.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter') {
+    const val = input.value.trim()
+    if(val) showConfirm(val)
+  }
+})
+
+document.getElementById('anim-toggle').addEventListener('click', () => {
+  cfg.anim = !cfg.anim
+  localStorage.setItem('cfg', JSON.stringify(cfg))
+  applyConfig()
+})
+document.getElementById('anim-speed').addEventListener('input', (e) => {
+  cfg.speed = Number(e.target.value)
+  localStorage.setItem('cfg', JSON.stringify(cfg))
+  applyConfig()
+})
+document.getElementById('icon-toggle').addEventListener('click', () => {
+  cfg.icon = !cfg.icon
+  localStorage.setItem('cfg', JSON.stringify(cfg))
+  applyConfig()
+})
+document.getElementById('font-size').addEventListener('input', (e) => {
+  cfg.font = parseFloat(e.target.value)
+  localStorage.setItem('cfg', JSON.stringify(cfg))
+  applyConfig()
+})
+</script>
+</body>
+</html>
