@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>快捷启动器 beta 0.1</title>
+<title>快捷启动器 beta 0.2</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0">
 <style>
 * {
@@ -18,7 +18,6 @@
   line-height: 1;
   user-select: none;
 }
-
 :root {
   --md3-primary: #6750A4;
   --md3-on-primary: #fff;
@@ -27,7 +26,7 @@
   --md3-on-surface: #1C1B1F;
   --md3-outline: #79747E;
   --radius-full: 999px;
-  --radius-lg: 32px;
+  --radius-lg: 48px; /*超级R角*/
   --radius-md: 20px;
   --anim-duration: 0.3s;
   --font-scale: 1;
@@ -45,13 +44,193 @@
     --md3-outline: #938F99;
   }
 }
-
 .no-anim * { transition: none !important; }
 .no-icon .app-icon, .no-icon .nav-icon { display: none !important; }
 
+.engine-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.engine-tab {
+  flex: 1;
+  min-width: 60px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--md3-surface-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-label);
+  position: relative;
+  cursor: pointer;
+}
+.engine-tab.active {
+  background: var(--md3-primary);
+  color: var(--md3-on-primary);
+}
+.engine-tab .check {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  display: none;
+}
+.engine-tab.active .check {
+  display: block;
+}
+
+.fab {
+  position: fixed;
+  right: 24px;
+  bottom: 100px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--md3-primary);
+  color: var(--md3-on-primary);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  cursor: pointer;
+  z-index: 90;
+}
+.bookmark-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--anim-duration) ease;
+  z-index: 9999;
+}
+.bookmark-modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+.bookmark-box {
+  background: var(--md3-surface);
+  border-radius: var(--radius-lg);
+  width: 320px;
+  padding: 24px;
+  transform: scale(0.95);
+  transition: transform var(--anim-duration) ease;
+}
+.bookmark-modal.show .bookmark-box {
+  transform: scale(1);
+}
+.bookmark-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--md3-outline);
+  background: transparent;
+  color: var(--md3-on-surface);
+  margin-bottom: 12px;
+  outline: none;
+  font-size: var(--font-text);
+}
+.bookmark-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+.bookmark-btn {
+  border: none;
+  background: transparent;
+  color: var(--md3-primary);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: var(--font-label);
+  cursor: pointer;
+}
+.bookmark-btn.confirm {
+  background: var(--md3-primary);
+  color: var(--md3-on-primary);
+}
+.bookmark-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.delete-icon {
+  cursor: pointer;
+  color: var(--md3-outline);
+  border-radius: 50%;
+  padding: 4px;
+}
+.delete-icon.active {
+  color: #CF4647;
+  background: var(--md3-surface-container);
+}
+.bookmark-item {
+  padding: 12px;
+  background: var(--md3-surface-container);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  font-size: var(--font-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bookmark-item.selected {
+  background: var(--md3-primary);
+  color: var(--md3-on-primary);
+}
+.select-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid var(--md3-outline);
+  display: grid;
+  place-items: center;
+}
+.select-box.checked {
+  background: var(--md3-primary);
+  border-color: var(--md3-primary);
+}
+.select-box::after {
+  content: 'done';
+  font-family: 'Material Symbols Rounded';
+  font-size: 16px;
+  color: #fff;
+  display: none;
+}
+.select-box.checked::after {
+  display: block;
+}
+.delete-bar {
+  display: none;
+  justify-content: space-between;
+  padding: 8px 0;
+  margin-bottom: 8px;
+}
+.delete-bar.show {
+  display: flex;
+}
+.delete-bar button {
+  border: none;
+  background: var(--md3-primary);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: var(--font-label);
+}
+.delete-bar .del-btn {
+  background: #CF4647;
+}
 html, body {
   height: 100%;
-  background: var(--md3-surface-container);
+  background: var(--md3-surface-container); /* 背景色*/
   color: var(--md3-on-surface);
   font-family: system-ui, sans-serif;
   overflow: hidden;
@@ -64,7 +243,8 @@ html, body {
 .pages {
   flex: 1;
   position: relative;
-  padding-bottom: 90px;
+  padding-bottom: 140px; /* 显示底部*/
+  overflow: hidden;
 }
 .page {
   position: absolute;
@@ -76,44 +256,49 @@ html, body {
   transform: translateX(30px);
   transition: opacity var(--anim-duration) cubic-bezier(0.2,0,0,1), transform var(--anim-duration) cubic-bezier(0.2,0,0,1);
   pointer-events: none;
+  padding-bottom: 60px;
 }
 .page.active {
   opacity: 1;
   transform: translateX(0);
   pointer-events: auto;
 }
-
+/* 原装大圆角卡片 */
 .card {
   background: var(--md3-surface);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  margin-bottom: 12px;
+  border-radius: var(--radius-lg); /* 超大圆盘 */
+  padding: 24px; /* 修复内测版bug */
+  margin-bottom: 16px;
+  overflow: hidden; /* 确保圆角不被内容截断 */
+}
+.card:last-child {
+  margin-bottom: 40px;
 }
 .card-title {
   font-size: var(--font-title);
-  margin-bottom: 12px;
+  margin-bottom: 20px; /* 标题间距稍微调整 */
 }
 input {
   width: 100%;
   height: 48px;
-  padding: 0 12px;
+  padding: 0 16px;
   border-radius: var(--radius-md);
   border: 1px solid var(--md3-outline);
   background: transparent;
   color: var(--md3-on-surface);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   outline: none;
   font-size: var(--font-text);
 }
 .btn {
   width: 100%;
-  height: 44px;
+  height: 48px;
   border-radius: var(--radius-full);
   border: none;
   background: var(--md3-primary);
   color: var(--md3-on-primary);
   font-weight: 500;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   font-size: var(--font-text);
 }
 .btn-outline {
@@ -121,15 +306,14 @@ input {
   border: 1px solid var(--md3-outline);
   color: var(--md3-on-surface);
 }
-
 .history {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 10px;
+  margin-top: 12px;
 }
 .history-item {
-  padding: 10px;
+  padding: 12px;
   background: var(--md3-surface-container);
   border-radius: var(--radius-md);
   font-size: var(--font-label);
@@ -138,29 +322,28 @@ input {
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 20px; /* 图标间距放大一点点而已 */
 }
 .app {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   cursor: pointer;
 }
 .app-icon {
-  width: 50px;
-  height: 50px;
+  width: 72px; /* 图标大小放大超大 */
+  height: 72px;
   border-radius: var(--radius-md);
   display: grid;
   place-items: center;
   color: #fff;
+  font-size: 32px;
 }
 .app-name {
-  font-size: var(--font-label);
+  font-size: var(--font-text);
   text-align: center;
 }
-
-/* 底部导航圆角改成 54px */
 .nav {
   position: fixed;
   bottom: 12px;
@@ -172,6 +355,7 @@ input {
   align-items: center;
   border-radius: 54px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  z-index: 999;
 }
 .nav-item {
   flex: 1;
@@ -186,14 +370,13 @@ input {
 .nav-item.active {
   color: var(--md3-primary);
 }
-
 .modal {
   position: fixed; inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.5);
   display: grid; place-items: center;
   opacity: 0; visibility: hidden;
-  transition: opacity var(--anim-duration) ease;
-  z-index: 999;
+  transition: all 0.3s ease;
+  z-index: 9999;
 }
 .modal.show {
   opacity: 1; visibility: visible;
@@ -202,11 +385,7 @@ input {
   background: var(--md3-surface);
   border-radius: var(--radius-lg);
   width: 280px;
-  padding: 20px;
-  transform: scale(0.95);
-  transition: transform var(--anim-duration) ease;
-}
-.modal.show .modal-box {
+  padding: 24px;
   transform: scale(1);
 }
 .modal-actions {
@@ -228,17 +407,16 @@ input {
   background: var(--md3-primary);
   color: var(--md3-on-primary);
 }
-
 .set-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
+  padding: 12px 0;
   font-size: var(--font-text);
 }
 .switch {
-  width: 44px; height: 22px;
-  border-radius: 11px;
+  width: 48px; height: 24px;
+  border-radius: 12px;
   background: var(--md3-outline);
   position: relative;
   cursor: pointer;
@@ -246,15 +424,14 @@ input {
 .switch::after {
   content: '';
   position: absolute;
-  width: 16px; height: 16px;
+  width: 18px; height: 18px;
   border-radius: 50%;
   background: #fff;
   top: 3px; left: 3px;
   transition: transform var(--anim-duration) ease;
 }
 .switch.on { background: var(--md3-primary); }
-.switch.on::after { transform: translateX(22px); }
-
+.switch.on::after { transform: translateX(24px); }
 .slider {
   width: 100%;
   margin-top: 8px;
@@ -263,7 +440,6 @@ input {
 </style>
 </head>
 <body>
-
 <div class="wrap">
 <div class="pages">
   <div class="page active" id="page-main">
@@ -274,6 +450,41 @@ input {
       <div class="card-title">历史记录</div>
       <div class="history" id="history"></div>
       <button class="btn btn-outline" id="clear">清空历史</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">全局搜索</div>
+      <input id="search-input" placeholder="输入搜索内容">
+      
+      <div class="engine-tabs">
+        <div class="engine-tab" data-engine="baidu">百度<span class="check">✓</span></div>
+        <div class="engine-tab active" data-engine="bing">必应<span class="check">✓</span></div>
+        <div class="engine-tab" data-engine="sogou">搜狗<span class="check">✓</span></div>
+        <div class="engine-tab" data-engine="360">360<span class="check">✓</span></div>
+        <div class="engine-tab" data-engine="google">谷歌<span class="check">✓</span></div>
+      </div>
+
+      <button class="btn" id="search-btn">搜索</button>
+      <div class="card-title" style="margin-top:16px">搜索记录</div>
+      <div class="history" id="search-history"></div>
+      <button class="btn btn-outline" id="clear-search">清空搜索记录</button>
+    </div>
+  </div>
+
+  <div class="page" id="page-bookmark">
+    <div class="card">
+      <div class="bookmark-head">
+        <div class="card-title">书签</div>
+        <span class="material-symbols-rounded delete-icon" id="del-toggle">delete</span>
+      </div>
+      <div class="delete-bar" id="delete-bar">
+        <button id="select-all">全选</button>
+        <button class="del-btn" id="delete-selected">删除选中</button>
+      </div>
+      <div id="bookmark-list"></div>
+    </div>
+    <div class="fab" id="add-bookmark">
+      <span class="material-symbols-rounded">add</span>
     </div>
   </div>
 
@@ -314,7 +525,7 @@ input {
     <div class="card">
       <div class="card-title">关于</div>
       <div class="set-item">
-        <div>版本: beta 0.1</div>
+        <div>版本: beta 0.2</div>
       </div>
     </div>
   </div>
@@ -324,6 +535,10 @@ input {
   <div class="nav-item active" data-page="page-main">
     <span class="material-symbols-rounded nav-icon">rocket_launch</span>
     <span>启动</span>
+  </div>
+  <div class="nav-item" data-page="page-bookmark">
+    <span class="material-symbols-rounded nav-icon">bookmark</span>
+    <span>书签</span>
   </div>
   <div class="nav-item" data-page="page-apps">
     <span class="material-symbols-rounded nav-icon">apps</span>
@@ -339,7 +554,7 @@ input {
 <div class="modal" id="modal">
   <div class="modal-box">
     <div style="font-size:var(--font-text);margin-bottom:8px">打开确认</div>
-    <div id="modal-text" style="font-size:var(--font-label)"></div>
+    <div id="modal-text"></div>
     <div class="modal-actions">
       <button class="modal-btn" id="m-cancel">取消</button>
       <button class="modal-btn confirm" id="m-ok">打开</button>
@@ -347,171 +562,238 @@ input {
   </div>
 </div>
 
+<div class="bookmark-modal" id="bookmark-modal">
+  <div class="bookmark-box">
+    <div class="card-title">添加书签</div>
+    <input class="bookmark-input" id="bk-name" placeholder="名称">
+    <input class="bookmark-input" id="bk-url" placeholder="地址">
+    <div class="bookmark-actions">
+      <button class="bookmark-btn" id="bk-cancel">取消</button>
+      <button class="bookmark-btn confirm" id="bk-save">保存</button>
+    </div>
+  </div>
+</div>
+
 <script>
-let cfg = JSON.parse(localStorage.getItem('cfg') || '{"anim":1,"speed":300,"icon":1,"font":1}')
-const root = document.documentElement
-const body = document.body
+document.activeElement?.blur();
+let cfg = JSON.parse(localStorage.getItem('cfg')||'{"anim":1,"speed":300,"icon":1,"font":1}');
+const root = document.documentElement;
+const body = document.body;
 
-function applyConfig() {
-  root.style.setProperty('--anim-duration', cfg.speed + 'ms')
-  root.style.setProperty('--font-scale', cfg.font)
-  body.classList.toggle('no-anim', !cfg.anim)
-  body.classList.toggle('no-icon', !cfg.icon)
-  
-  document.getElementById('anim-toggle').classList.toggle('on', cfg.anim)
-  document.getElementById('icon-toggle').classList.toggle('on', cfg.icon)
-  document.getElementById('anim-speed').value = cfg.speed
-  document.getElementById('font-size').value = cfg.font
+function applyConfig(){
+  root.style.setProperty('--anim-duration', cfg.speed+'ms');
+  root.style.setProperty('--font-scale', cfg.font);
+  body.classList.toggle('no-anim',!cfg.anim);
+  body.classList.toggle('no-icon',!cfg.icon);
+  document.getElementById('anim-toggle').classList.toggle('on',cfg.anim);
+  document.getElementById('icon-toggle').classList.toggle('on',cfg.icon);
+  document.getElementById('anim-speed').value=cfg.speed;
+  document.getElementById('font-size').value=cfg.font;
 }
-applyConfig()
+applyConfig();
 
-const pages = document.querySelectorAll('.page')
-const navs = document.querySelectorAll('.nav-item')
-navs.forEach(item => {
-  item.addEventListener('click', () => {
-    const target = item.dataset.page
-    pages.forEach(p => p.classList.remove('active'))
-    navs.forEach(i => i.classList.remove('active'))
-    document.getElementById(target).classList.add('active')
-    item.classList.add('active')
+const pages=document.querySelectorAll('.page');
+const navs=document.querySelectorAll('.nav-item');
+navs.forEach((item,i)=>{
+  item.addEventListener('click',()=>{
+    const tg=item.dataset.page;
+    pages.forEach(p=>p.classList.remove('active'));
+    navs.forEach(n=>n.classList.remove('active'));
+    document.getElementById(tg).classList.add('active');
+    item.classList.add('active');
   })
 })
 
-let currentTarget = ''
-function openRouter(target) {
-  if(!target) return
-  target = target.trim()
-  
-  let hist = JSON.parse(localStorage.getItem('hist') || '[]')
-  if(!hist.includes(target)) {
-    hist.unshift(target)
-    hist = hist.slice(0, 15)
-    localStorage.setItem('hist', JSON.stringify(hist))
-    renderHist()
+let currentTarget='';
+function showConfirm(t){
+  currentTarget=t;
+  const m=document.getElementById('modal');
+  m.classList.remove('show'); void m.offsetWidth;
+  m.classList.add('show');
+  document.getElementById('modal-text').innerText='打开：'+t;
+}
+function hideConfirm(){
+  document.getElementById('modal').classList.remove('show');
+  currentTarget='';
+}
+
+function openApp(pkg){
+  const uri=`intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${pkg};launchFlags=0x10000000;end`;
+  const a=document.createElement('a');a.href=uri;a.target='_self';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>window.location.href=uri,100);
+}
+function openUrl(u){
+  if(!u.startsWith('http'))u='https://'+u;
+  window.open(u,'_blank');
+}
+function openRouter(t){
+  if(!t)return; t=t.trim();
+  const r=/^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z0-9_]+)+$/;
+  if(r.test(t)&&!t.includes('www')&&!t.includes('.com')&&!t.includes('.cn')){
+    openApp(t);
+  }else{
+    openUrl(t);
   }
-
-  if(target.startsWith('http')) {
-    window.open(target, '_blank')
-  } else {
-    window.location.href = `intent://#Intent;package=${target};action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end`
-  }
+  let h=JSON.parse(localStorage.getItem('hist')||'[]');
+  if(!h.includes(t)){h.unshift(t);h=h.slice(0,15);localStorage.setItem('hist',JSON.stringify(h));renderHist();}
 }
 
-const modal = document.getElementById('modal')
-const mText = document.getElementById('modal-text')
-const mCancel = document.getElementById('m-cancel')
-const mOk = document.getElementById('m-ok')
+document.getElementById('m-cancel').onclick=hideConfirm;
+document.getElementById('m-ok').onclick=()=>{if(currentTarget)openRouter(currentTarget);hideConfirm();}
 
-function showConfirm(target) {
-  currentTarget = target
-  mText.textContent = `确定打开：\n${target}`
-  modal.classList.add('show')
-}
-function hideConfirm() {
-  modal.classList.remove('show')
-  currentTarget = ''
-}
-
-mCancel.addEventListener('click', hideConfirm)
-mOk.addEventListener('click', () => {
-  if(currentTarget) openRouter(currentTarget)
-  hideConfirm()
-})
-
-const apps = [
+const apps=[
   {n:"微信",p:"com.tencent.mm",icon:"chat",c:"#07C160"},
   {n:"QQ",p:"com.tencent.mobileqq",icon:"forum",c:"#12B7F5"},
   {n:"设置",p:"com.android.settings",icon:"settings",c:"#607D8B"},
   {n:"浏览器",p:"com.android.browser",icon:"globe",c:"#1E88E5"},
   {n:"我的世界",p:"com.mojang.minecraftpe",icon:"cube",c:"#795548"},
   {n:"相机",p:"com.huawei.camera",icon:"camera",c:"#F57C00"}
-]
-const webs = [
+];
+const webs=[
   {n:"Bing",u:"https://bing.com",icon:"search",c:"#007DB8"},
   {n:"百度",u:"https://baidu.com",icon:"find_in_page",c:"#2932E3"},
   {n:"B站",u:"https://bilibili.com",icon:"play_arrow",c:"#FB7299"},
   {n:"抖音",u:"https://douyin.com",icon:"music_video",c:"#000"},
   {n:"淘宝",u:"https://taobao.com",icon:"shopping_cart",c:"#FF4400"},
   {n:"支付宝",u:"https://alipay.com",icon:"payment",c:"#1677FF"}
-]
+];
 
-function makeGrid(el, arr, isWeb) {
-  const box = document.getElementById(el)
-  arr.forEach(item => {
-    const div = document.createElement('div')
-    div.className = 'app'
-    div.innerHTML = `
-      <div class="app-icon" style="background:${item.c}">
-        <span class="material-symbols-rounded">${item.icon}</span>
-      </div>
-      <div class="app-name">${item.n}</div>
-    `
-    div.addEventListener('click', () => {
-      showConfirm(isWeb ? item.u : item.p)
-    })
-    box.appendChild(div)
+function makeGrid(el,arr,isWeb){
+  const g=document.getElementById(el);g.innerHTML='';
+  arr.forEach(o=>{
+    const d=document.createElement('div');d.className='app';
+    d.innerHTML=`<div class="app-icon" style="background:${o.c}"><span class="material-symbols-rounded">${o.icon}</span></div><div class="app-name">${o.n}</div>`;
+    d.onclick=()=>showConfirm(isWeb?o.u:o.p);
+    g.appendChild(d);
   })
 }
-makeGrid('app-grid', apps)
-makeGrid('web-grid', webs, true)
+makeGrid('app-grid',apps);
+makeGrid('web-grid',webs,true);
 
-const input = document.getElementById('input')
-const openBtn = document.getElementById('open')
-const histEl = document.getElementById('history')
-const clearBtn = document.getElementById('clear')
-
-function renderHist() {
-  let hist = JSON.parse(localStorage.getItem('hist') || '[]')
-  if(!hist.length) {
-    histEl.innerHTML = '<div style="text-align:center;color:#888;font-size:var(--font-label)">暂无记录</div>'
-    return
-  }
-  histEl.innerHTML = ''
-  hist.forEach(item => {
-    const div = document.createElement('div')
-    div.className = 'history-item'
-    div.textContent = item
-    div.addEventListener('click', () => input.value = item)
-    histEl.appendChild(div)
+const input=document.getElementById('input');
+const openBtn=document.getElementById('open');
+const hist=document.getElementById('history');
+const clearBtn=document.getElementById('clear');
+function renderHist(){
+  let h=JSON.parse(localStorage.getItem('hist')||'[]');
+  hist.innerHTML=h.length?'':'<div style="text-align:center;color:#888">暂无记录</div>';
+  h.forEach(s=>{
+    const d=document.createElement('div');d.className='history-item';d.textContent=s;
+    d.onclick=()=>input.value=s; hist.appendChild(d);
   })
 }
-clearBtn.addEventListener('click', () => {
-  localStorage.setItem('hist', '[]')
-  renderHist()
-})
-renderHist()
+clearBtn.onclick=()=>{localStorage.setItem('hist','[]');renderHist();}
+renderHist();
+openBtn.onclick=()=>{if(input.value.trim())showConfirm(input.value.trim());}
+input.onkeydown=e=>{if(e.key==='Enter'&&input.value.trim())showConfirm(input.value.trim());}
 
-openBtn.addEventListener('click', () => {
-  const val = input.value.trim()
-  if(val) showConfirm(val)
-})
-input.addEventListener('keydown', (e) => {
-  if(e.key === 'Enter') {
-    const val = input.value.trim()
-    if(val) showConfirm(val)
+const searchInput=document.getElementById('search-input');
+const searchBtn=document.getElementById('search-btn');
+const searchHistory=document.getElementById('search-history');
+const clearSearch=document.getElementById('clear-search');
+const engineTabs=document.querySelectorAll('.engine-tab');
+
+let currentEngine='bing';
+const engineUrls={
+  baidu:'https://www.baidu.com/s?wd=',
+  bing:'https://www.bing.com/search?q=',
+  sogou:'https://www.sogou.com/web?query=',
+  360:'https://www.so.com/s?q=',
+  google:'https://www.google.com/search?q='
+};
+
+engineTabs.forEach(tab=>{
+  tab.onclick=()=>{
+    engineTabs.forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    currentEngine=tab.dataset.engine;
   }
-})
+});
 
-document.getElementById('anim-toggle').addEventListener('click', () => {
-  cfg.anim = !cfg.anim
-  localStorage.setItem('cfg', JSON.stringify(cfg))
-  applyConfig()
-})
-document.getElementById('anim-speed').addEventListener('input', (e) => {
-  cfg.speed = Number(e.target.value)
-  localStorage.setItem('cfg', JSON.stringify(cfg))
-  applyConfig()
-})
-document.getElementById('icon-toggle').addEventListener('click', () => {
-  cfg.icon = !cfg.icon
-  localStorage.setItem('cfg', JSON.stringify(cfg))
-  applyConfig()
-})
-document.getElementById('font-size').addEventListener('input', (e) => {
-  cfg.font = parseFloat(e.target.value)
-  localStorage.setItem('cfg', JSON.stringify(cfg))
-  applyConfig()
-})
+function renderSearchHist(){
+  let s=JSON.parse(localStorage.getItem('searchHist')||'[]');
+  searchHistory.innerHTML=s.length?'':'<div style="text-align:center;color:#888">暂无记录</div>';
+  s.forEach(k=>{
+    const d=document.createElement('div');d.className='history-item';d.textContent=k;
+    d.onclick=()=>searchInput.value=k; searchHistory.appendChild(d);
+  })
+}
+clearSearch.onclick=()=>{localStorage.setItem('searchHist','[]');renderSearchHist();}
+renderSearchHist();
+
+function doSearch(){
+  const kw=searchInput.value.trim();
+  if(!kw)return;
+  let arr=JSON.parse(localStorage.getItem('searchHist')||'[]');
+  if(!arr.includes(kw)){arr.unshift(kw);arr=arr.slice(0,15);localStorage.setItem('searchHist',JSON.stringify(arr));renderSearchHist();}
+  window.open(engineUrls[currentEngine]+encodeURIComponent(kw),'_blank');
+}
+searchBtn.onclick=doSearch;
+searchInput.onkeydown=e=>{if(e.key==='Enter')doSearch();}
+
+document.getElementById('anim-toggle').onclick=()=>{cfg.anim=!cfg.anim;localStorage.setItem('cfg',JSON.stringify(cfg));applyConfig();}
+document.getElementById('anim-speed').oninput=e=>{cfg.speed=+e.target.value;localStorage.setItem('cfg',JSON.stringify(cfg));applyConfig();}
+document.getElementById('icon-toggle').onclick=()=>{cfg.icon=!cfg.icon;localStorage.setItem('cfg',JSON.stringify(cfg));applyConfig();}
+document.getElementById('font-size').oninput=e=>{cfg.font=+e.target.value;localStorage.setItem('cfg',JSON.stringify(cfg));applyConfig();}
+
+const bkModal=document.getElementById('bookmark-modal');
+const bkName=document.getElementById('bk-name');
+const bkUrl=document.getElementById('bk-url');
+const bkCancel=document.getElementById('bk-cancel');
+const bkSave=document.getElementById('bk-save');
+const bkList=document.getElementById('bookmark-list');
+const addBk=document.getElementById('add-bookmark');
+const delToggle=document.getElementById('del-toggle');
+const deleteBar=document.getElementById('delete-bar');
+const selectAll=document.getElementById('select-all');
+const deleteSelected=document.getElementById('delete-selected');
+
+let delMode=false;let selected=[];
+addBk.onclick=()=>{bkModal.classList.add('show');bkName.value=bkUrl.value='';}
+bkCancel.onclick=()=>bkModal.classList.remove('show');
+
+function renderBookmark(){
+  let b=JSON.parse(localStorage.getItem('bookmarks')||'[]');
+  bkList.innerHTML=b.length?'':'<div style="text-align:center;color:#888">暂无书签</div>';
+  b.forEach((o,i)=>{
+    const d=document.createElement('div');d.className='bookmark-item';
+    if(delMode){
+      d.innerHTML=`<div class="select-box ${selected.includes(i)?'checked':''}" data-i="${i}"></div>${o.name}`;
+      d.querySelector('.select-box').onclick=e=>{
+        const idx=+e.target.dataset.i;
+        selected=selected.includes(idx)?selected.filter(x=>x!==idx):[...selected,idx];
+        renderBookmark();
+      }
+    }else{
+      d.textContent=o.name; d.onclick=()=>showConfirm(o.url);
+    }
+    bkList.appendChild(d);
+  })
+  deleteBar.classList.toggle('show',delMode);
+  delToggle.classList.toggle('active',delMode);
+}
+renderBookmark();
+
+bkSave.onclick=()=>{
+  const n=bkName.value.trim();let u=bkUrl.value.trim();
+  if(!n||!u)return; if(!u.startsWith('http'))u='https://'+u;
+  let b=JSON.parse(localStorage.getItem('bookmarks')||'[]');
+  b.unshift({name:n,url:u});localStorage.setItem('bookmarks',JSON.stringify(b));
+  renderBookmark();bkModal.classList.remove('show');
+}
+delToggle.onclick=()=>{delMode=!delMode;selected=[];renderBookmark();}
+selectAll.onclick=()=>{
+  let b=JSON.parse(localStorage.getItem('bookmarks')||'[]');
+  selected=selected.length===b.length?[]:b.map((_,i)=>i);
+  renderBookmark();
+}
+deleteSelected.onclick=()=>{
+  let b=JSON.parse(localStorage.getItem('bookmarks')||'[]');
+  b=b.filter((_,i)=>!selected.includes(i));
+  localStorage.setItem('bookmarks',JSON.stringify(b));
+  selected=[];delMode=false;renderBookmark();
+}
 </script>
 </body>
 </html>
